@@ -52,18 +52,25 @@ def solve(x_0, tol):
                 Jx_kF = np.linalg.solve(JF(x_0),-Fx)        #Mult J-1*F(x)
 
                 y_k = x_0 + 1/2*(Jx_kF)
+                
 
                 JF_sol = np.linalg.solve(JF(y_k),-F(x_0))
+               
             
                 z_k = x_0 + JF_sol
 
                 M = (a *JF(x_0) + b *  JF(y_k))
+                
                
                 Fz = F(z_k)
-               
+                
                 M_solve = np.linalg.solve(M,-Fz)
-
+                
+                
+                
                 x_k = z_k + M_solve
+                
+                
 
                 x_0 = x_k
 
@@ -80,6 +87,7 @@ def solve(x_0, tol):
                 err.append(ep)
                 
                 ep = np.linalg.norm(F(x_0),2)
+                print(ep)
                 
             return x_k,itera
 
