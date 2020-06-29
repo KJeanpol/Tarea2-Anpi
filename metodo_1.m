@@ -1,6 +1,6 @@
 warning('off')
 pkg load symbolic
-function [x_k,itera] = metodo_1(F,vars,x_0,tol) 
+function [x_k,itera,ep] = metodo_1(F,vars,x_0,tol) 
     w=[];
     x=[];
     y=[];
