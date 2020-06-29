@@ -1,0 +1,948 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<div style=\"text-align: center;\" role=\"presentation\">\n",
+    "<h1 role=\"presentation\"><strong><span role=\"presentation\">An&aacute;lisis Num&eacute;rico para Ingenier&iacute;a - I Semestre 2020</span></strong></h1>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h1 style=\"text-align: center;\"><span style=\"color: #0000ff;\">TAREA 2</span></h1>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<p><strong>Descripci&oacute;n:&nbsp;</strong>Este documento presenta la resolución de la tarea 2 del curso Análisis Numérico para Ingeniería.</p>\n",
+    "\n",
+    "<p><strong>Integrantes</strong><ul>\n",
+    "<li>Kenneth Jeanpol Alvarado Mendez 2015095715</li>\n",
+    "<li>Yenira Chacón Molina 2015075331</li>\n",
+    "<li>Jonathan Alberto Guzmán Araya 2013041216</li>\n",
+    "<li>Dario Josué Rodríguez Obando 2017117105</li>    \n",
+    "</ul>.</p>\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<a id='biseccion'></a>\n",
+    "<h2><span style=\"color: #993300;\"><span style=\"text-decoration: underline;\"><strong></strong>Parte 1: Método de Newton-Raphson</span></span></h2>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>a) Problema a Resolver </strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "\n",
+    "<h4>Dar solución a un sistema de m ecuaciones no lineales con m incógnitas. El problema se puede representar matemáticamente como :</h4>\n",
+    "\n",
+    "$$ F(x)=0_{m} $$\n",
+    "donde  $0_{m}=(0,0,....,0)^{T} \\in \\mathbb{R}^{m}$\n",
+    "\n",
+    "$$\\begin{equation}\n",
+    "F(x)=\\begin{pmatrix}\n",
+    "f_{1}(x_{1},x_{2},.....,x_{m}) \\\\\n",
+    "f_{2}(x_{1},x_{2},.....,x_{m})  \\\\\n",
+    "                                .\\\\\n",
+    "                                 .\\\\\n",
+    "f_{m}(x_{1},x_{2},.....,x_{m})\\end{pmatrix}\n",
+    "\\end{equation}$$\n",
+    "\n",
+    "\n",
+    "y cada  $f_{i}(x_{1},x_{2},.....,x_{m}):\\mathbb{R}^{m}\\rightarrow \\mathbb{R}$ es una función no lineal\n",
+    "    \n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>b) Formulaci&oacute;n Matem&aacute;tica</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "$\\left\\{\\begin{matrix}\n",
+    "x_{k+1} & = & x_{k}-[J_{f}(x_{k})]^{-1}f(x_{k})\\\\ \n",
+    "x_{0} \\in \\mathbb{R}^{n} &  &\\text{Vector inicial}\n",
+    "\\end{matrix}\\right.$\n",
+    "\n",
+    "Donde $J_{f}(x_{k})$ es invertible para todo $k=0,1,2,....$\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>c) Valores Iniciales</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "$x_{0} \\in \\mathbb{R}^{n}=$ Vector inicial para empezar las iteraciones que satisfacen $ F(x)=0_{m} $"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>d) Pasos del m&eacute;todo (Pseudoc&oacute;digo)</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<div class=\"alert alert-block alert-success\">\n",
+    "<h2 style=\"text-align: center;\">Método de Newton-Raphson</h2>\n",
+    "    \n",
+    "    \n",
+    "<h4 style=\"padding-left: 30px;\">Entradas:</h4>\n",
+    "    \n",
+    "<p>\n",
+    "        <li>$f$= sistemas de ecuaciones no lineales</li>\n",
+    "        <li>vars= variables de las cuales son dependientes el sistema de ecuaciones</li>\n",
+    "        <li>x_{0}= vector inicial de soluciones para empezar las iteraciones del método</li>\n",
+    "        <li>tol= tolerancia minima aceptada para el vector de soluciones</li>\n",
+    "        <li>maxIter= Cantidad maxima de iteraciones a realizar para encontrar el vector de soluciones</li>\n",
+    "</p>\n",
+    "    \n",
+    "    \n",
+    "<h4 style=\"padding-left: 30px;\">Pseudoc&oacute;digo:</h4>\n",
+    "<ul>\n",
+    "    <li>Encontrar el jacobiano de $f$ como $Jf$\n",
+    "    <li>Definir $x_{k}=x_{0}$\n",
+    "    <li>Definir el error como $error=tol+1$\n",
+    "    <li>Definir la iteracion como $k=t0$\n",
+    "<ul>\n",
+    "    \n",
+    "\n",
+    "</ul>\n",
+    "</li><li> Mientras el $error>tol $ y $iteracion < maxIter$\n",
+    "<ul>\n",
+    "    \n",
+    "<li> Jf_xk = $Jf(x_{k})$</li>\n",
+    "<li>  f_xk = $f(x_{k})$</li>\n",
+    "<li>  $y_{k}$= encontrar la solución de la ecuación \" Jf_xk$* y = $ f_xk \"</li>\n",
+    "<li>  $x_{k}$ = $x_{k} $ -  $y_{k}$ </li>   \n",
+    "    \n",
+    "     \n",
+    "<li>k = k+1</li>    \n",
+    "<li>error = $\\begin{Vmatrix}\n",
+    "f(x_{k})\n",
+    "\\end{Vmatrix}$</li>\n",
+    "    \n",
+    "\n",
+    "</ul>\n",
+    "</li>\n",
+    "<li>fin</li>\n",
+    "</ul>\n",
+    "</div>\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>e) Método linsolve</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<div class=\"alert alert-block alert-success\">\n",
+    "<h4>En GNU Octave, el metodo linsolve es utilizado para resolver sistemas de ecuaciones</h4>\n",
+    "\n",
+    "<h4>X = linsolve(A,B) resuelve el sistema lineal AX = B usando uno de los siguientes métodos:</h4>\n",
+    " \n",
+    "<p>\n",
+    "        <li>Cuando A es cuadrado, linsolve usa la factorización LU con pivote parcial.</li>\n",
+    "        <li>Para todos los demás casos, linsolve utiliza la factorización QR con pivote de columna.</li>\n",
+    "</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "![](gradiente.JPG)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>f) C&oacute;digo en GNU Octave</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "kernel": "Octave"
+   },
+   "outputs": [],
+   "source": [
+    "warning('off')\n",
+    "function [xk,k,err] = newton_raphson_nl(f,vars,x0,tol,maxIter)\n",
+    "  n=length(vars);\n",
+    "  var=cell(1,n);\n",
+    "  for i=1:n\n",
+    "    var(1,i)=vars(i);\n",
+    "  endfor\n",
+    "  index={''};\n",
+    "  flag=strcat(var,index);\n",
+    "  vars=sym(flag);\n",
+    "  xk=x0';\n",
+    "  Jf=jacobian(f,vars);\n",
+    "  k=0;\n",
+    "  err=tol+1;\n",
+    "  iteraciones=[0];\n",
+    "  error=[err];\n",
+    "  while(k<maxIter&& err>tol)\n",
+    "    Jf_xk=subs(Jf, vars, xk);\n",
+    "    f_xk=(subs(f, vars, xk))';\n",
+    "    xk= xk-linsolve(double(Jf_xk), double(f_xk));\n",
+    "    k=k+1;\n",
+    "    f_xk=double(subs(f, vars, xk));\n",
+    "    err=double(norm(f_xk));\n",
+    "    iteraciones=[iteraciones k];\n",
+    "    error=[error err];\n",
+    "  endwhile\n",
+    "  plot(iteraciones,error,'b--o')\n",
+    "  title(\"Método de Newton-Raphson\");\n",
+    "  xlabel(\"Iteraciones\");\n",
+    "  ylabel(\"%Error\");\n",
+    "endfunction"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "Python 3"
+   },
+   "source": [
+    "<h3><strong>g) Problema a Resolver</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "Python 3"
+   },
+   "source": [
+    "Use la iteración de Newton para aproximar la solución del sistema no lineal\n",
+    "\n",
+    "$\\left\\{\\begin{matrix}\n",
+    "cos(x_{2})-cos(x_{1}) &= & 0 \\\\ \n",
+    "x_{3}^{x_{1}} &= & \\frac{1}{x_{2}} \\\\ \n",
+    " e^{x_{1}}-x_{3}^{2}&= & 0\n",
+    "\\end{matrix}\\right.$\n",
+    "\n",
+    "Utilice $x_0=(0.5,0.5,0.5)^{t}$ , $tol= 10^{-5}$ , $iterMax=1000$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "kernel": "Octave",
+    "scrolled": false
+   },
+   "outputs": [],
+   "source": [
+    "pkg load symbolic\n",
+    "f=[cos(y)-cos(x),(z**x)-(1/y),exp(x)-(z**2)];\n",
+    "vars=['x','y','z'];   \n",
+    "x0=[0.5 0.5 0.5];\n",
+    "tol=0.00001;\n",
+    "maxIter=1000;\n",
+    "[xk,k,err]=newton_raphson_nl(f,vars,x0,tol,maxIter)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "Python 3"
+   },
+   "source": [
+    "<a id='biseccion'></a>\n",
+    "<h2><span style=\"color: #993300;\"><span style=\"text-decoration: underline;\"><strong></strong>Parte 2: Método de Newton-Raphson</span></span></h2>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>a) Problema a Resolver </strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "El artículo **Accelerated methods of order 2p for systems of nonlinear equations** presenta un nuevo método iterativo de orden de convergencia 5, para resolver sistemas de ecuaciones no lineales, al fusionar el método del punto medio con el método de Newton en conjunto con la aproximación para la matriz Jacobiana y así poder reducir el número de iteraciones. Este método fue implementado en Octave y para comprobar su correcta implementación se utilizó el siguiente sistema de ecuaciones no lineal:\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    w^{2} + x -3y + 4z = \\frac{-3}{4}\n",
+    "\\end{equation}\n",
+    "\\begin{equation}\n",
+    "    3w^{2} + x - y^{2} + z^{2} = \\frac{-13}{4}\n",
+    "\\end{equation}\n",
+    "\\begin{equation}\n",
+    "    5w + 3x^{2} + y - 4z^{2} = \\frac{99}{2}\n",
+    "\\end{equation}\n",
+    "\\begin{equation}\n",
+    "    8w^{2} - 14x + 6y^{2} - 7z^{2} = -7\n",
+    "\\end{equation}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>b) Formulaci&oacute;n Matem&aacute;tica</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\\begin{equation}\n",
+    "    y^{(k)} = x^{k} - \\frac{1}{2} J_f(x^{(k)})^{-1}F(x^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    z^{(k)} = x^{(k)} - J_f(y^{(k)})^{-1}F(x^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    x^{(k+1)} = z^{(k)} - (\\alpha J_f(x^{(k)})+ \\beta J_f(y^{(k)})^{-1}F(z^{(k)})\n",
+    "\\end{equation}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>c) Valores Iniciales</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "$x_{0} \\in \\mathbb{R}^{n}=$ Vector inicial para empezar las iteraciones que satisfacen $ F(x)=0_{m} $"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>d) Pasos del m&eacute;todo (Pseudoc&oacute;digo)</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<div class=\"alert alert-block alert-success\">\n",
+    "<h2 style=\"text-align: center;\">Método 1</h2>\n",
+    "    \n",
+    "    \n",
+    "<h4 style=\"padding-left: 30px;\">Entradas:</h4>\n",
+    "    \n",
+    "<p>\n",
+    "        <li>$f$= sistemas de ecuaciones no lineales</li>\n",
+    "        <li>vars= variables de las cuales son dependientes el sistema de ecuaciones</li>\n",
+    "        <li>x_{0}= vector inicial de soluciones para empezar las iteraciones del método</li>\n",
+    "        <li>tol= tolerancia minima aceptada para el vector de soluciones</li>\n",
+    "</p>\n",
+    "    \n",
+    "    \n",
+    "<h4 style=\"padding-left: 30px;\">Pseudoc&oacute;digo:</h4>\n",
+    "<ul>\n",
+    "    <li>Encontrar el jacobiano de $f$ como $Jf$\n",
+    "    <li>Aplicar la fórmula de aproximación de la sección de Formulación matemática para obtener $x_{k}$   \n",
+    "    <li>Definir $x_{0}=x_{k}$\n",
+    "    <li>Definir el error como $error=tol+1$\n",
+    "    <li>Definir la iteracion como $k=k+1$\n",
+    "<ul>\n",
+    "    \n",
+    "\n",
+    "</ul>\n",
+    "</li><li> Mientras el $error>tol $ y $iteracion < maxIter$\n",
+    "<ul>\n",
+    "    \n",
+    "\\begin{equation}\n",
+    "    y^{(k)} = x^{k} - \\frac{1}{2} J_f(x^{(k)})^{-1}F(x^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    z^{(k)} = x^{(k)} - J_f(y^{(k)})^{-1}F(x^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    x^{(k+1)} = z^{(k)} - (\\alpha J_f(x^{(k)})+ \\beta J_f(y^{(k)})^{-1}F(z^{(k)})\n",
+    "\\end{equation}   \n",
+    "    \n",
+    "     \n",
+    "<li>k = k+1</li>    \n",
+    "<li>error = $\\begin{Vmatrix}\n",
+    "f(x_{k})\n",
+    "\\end{Vmatrix}$</li>\n",
+    "    \n",
+    "\n",
+    "</ul>\n",
+    "</li>\n",
+    "<li>fin</li>\n",
+    "</ul>\n",
+    "</div>\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<h3><strong>e) Método linsolve</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "SoS"
+   },
+   "source": [
+    "<div class=\"alert alert-block alert-success\">\n",
+    "<h4>En GNU Octave, el metodo linsolve es utilizado para resolver sistemas de ecuaciones</h4>\n",
+    "\n",
+    "<h4>X = linsolve(A,B) resuelve el sistema lineal AX = B usando uno de los siguientes métodos:</h4>\n",
+    " \n",
+    "<p>\n",
+    "        <li>Cuando A es cuadrado, linsolve usa la factorización LU con pivote parcial.</li>\n",
+    "        <li>Para todos los demás casos, linsolve utiliza la factorización QR con pivote de columna.</li>\n",
+    "</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "Octave"
+   },
+   "source": [
+    "<h3><strong>f) C&oacute;digo en GNU Octave</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {
+    "kernel": "Octave"
+   },
+   "outputs": [],
+   "source": [
+    "warning('off')\n",
+    "pkg load symbolic\n",
+    "function [x_k,itera] = metodo_1(F,vars,x_0,tol) \n",
+    "    w=[];\n",
+    "    x=[];\n",
+    "    y=[];\n",
+    "    z=[];\n",
+    "    error=[];\n",
+    "    a=1;\n",
+    "    b=-2;\n",
+    "    itera=0;\n",
+    "    iteraciones=[];\n",
+    "    ep=tol+1;\n",
+    "    JF= jacobian(F,vars);\n",
+    "\n",
+    "    while(ep>tol)\n",
+    "        Jx_kF = linsolve(double(Fx(JF,vars,x_0)), double(-Fx(F, vars, x_0))');\n",
+    "\n",
+    "        y_k=x_0 + (1/2)*(Jx_kF');\n",
+    "\n",
+    "        JF_sol = linsolve(double(Fx(JF,vars,y_k)), double(-Fx(F, vars, x_0))');\n",
+    "\n",
+    "        z_k = x_0 + JF_sol';\n",
+    "\n",
+    "        M = double(a * Fx(JF,vars,x_0) + b *  Fx(JF,vars,y_k));\n",
+    "\n",
+    "        Fz= double(Fx(F,vars,z_k));\n",
+    "\n",
+    "        M_solve = linsolve(M,-Fz');\n",
+    "\n",
+    "        x_k = z_k + M_solve';\n",
+    "\n",
+    "        x_0=x_k;\n",
+    "\n",
+    "        itera = itera+ 1;\n",
+    "        iteraciones=[iteraciones itera];\n",
+    "        w=[w x_0(1)];\n",
+    "        x=[x x_0(2)];\n",
+    "        y=[y x_0(3)];\n",
+    "        z=[z x_0(4)];\n",
+    "        error=[error ep];\n",
+    "        ep=double(norm(Fx(F,vars,x_0)));\n",
+    "    endwhile\n",
+    "    plot(iteraciones,error,'b--o') \n",
+    "    title(\"Método de Newton-Raphson\");\n",
+    "    xlabel(\"Iteraciones\");\n",
+    "    ylabel(\"%Error\");\n",
+    "endfunction\n",
+    "\n",
+    "function F = Fx(f,vars,x_0) \n",
+    "    F=subs(f, vars, x_0);     \n",
+    "endfunction"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "Octave"
+   },
+   "source": [
+    "<h3><strong>g) Problema a Resolver</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {
+    "kernel": "Octave"
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "x_k =\n",
+      "\n",
+      "   0.50000   4.00000   3.00000   1.00000\n",
+      "\n",
+      "itera =  4\n"
+     ]
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<IPython.core.display.Image object>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "pkg load symbolic\n",
+    "syms x y z w\n",
+    "f=[(w**2)+x-(3*y)+(4*z)+(3/4),(3*w**2)+x-(y**2)+(z**2)+(13/4),(5*w)+(3*x**2)+y-(4*z**2)-(99/2),(8*w**2)-(14*x)+(6*y**2)-(7*z**2)+7];\n",
+    "vars=[w,x,y,z];\n",
+    "x0=[2 1 2 1];\n",
+    "tol=0.1;\n",
+    "[x_k,itera]=metodo_1(f,vars,x0,tol)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "Octave"
+   },
+   "source": [
+    "<h3><strong>h) Análisis de Resultados </strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "kernel": "Octave"
+   },
+   "source": [
+    "El método realiza la aproximación de los valores del sistema de ecuaciones en una cantidad de iteraciones menor a la que lo hace el Método de Newton-Raphson y con un margen de error menor, lo que lo vuelve un sistema más preciso en comparación con otros sistemas de ecuaciones no lineales."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<a id='biseccion'></a> <h2><span style=\"color: #993300;\"><span style=\"text-decoration: underline;\"><strong></strong>Parte 2: Aumento del orden de convergencia para esquemas iterativos para resolver sistemas no lineales</span></span></h2>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><strong>a) Problema a Resolver </strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "El artículo **Increasing the order of convergence of iterative schemes for solving nonlinear system** presenta un conjunto de métodos iterativos de varios pasos con un orden de convergencia creciente para resolver sistemas de ecuaciones no lineales, una de las principales ventajas de estos esquemas es lograr un alto orden de convergencia con pocas evaluaciones jacobianas y funcionales, junto con el uso de la misma matriz de coeficientes en la mayoría de los sistemas lineales involucrados en el\n",
+    "proceso."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><strong>b) Formulaci&oacute;n Matem&aacute;tica</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\\begin{equation}\n",
+    "    y^{(k)} = x^{(k)} - \\frac{1}{2} [F'(x^{(k)})]^{-1}F(x^{((k))})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    z^{(k)} = \\frac{1}{3}(4y^{(k)} - x^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    u^{(k)} = y^{(k)} + [F'(x^{(k)} - 3F'(z^{(k)})]^{-1}F(x^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    v^{(k)} = u^{(k)} + 2[F'(x^{(k)} - 3F'(z^{(k)})]^{-1}F(u^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    x^{k+1)} = v^{(k)} + 2[F'(x^{(k)} - 3F'(z^{(k)})]^{-1}F(v^{(k)})\n",
+    "\\end{equation}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><strong>c) Valores Iniciales</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$x_{0} \\in \\mathbb{R}^{n}=$ Vector inicial para empezar las iteraciones que satisfacen $ F(x)=0_{m} $"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><strong>d) Pasos del m&eacute;todo (Pseudoc&oacute;digo)</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-block alert-success\">\n",
+    "<h2 style=\"text-align: center;\">Método 2</h2>\n",
+    "    \n",
+    "    \n",
+    "<h4 style=\"padding-left: 30px;\">Entradas:</h4>\n",
+    "    \n",
+    "<p>\n",
+    "        <li>$f$= sistemas de ecuaciones no lineales</li>\n",
+    "        <li>vars= variables de las cuales son dependientes el sistema de ecuaciones</li>\n",
+    "        <li>x_{0}= vector inicial de soluciones para empezar las iteraciones del método</li>\n",
+    "        <li>tol= tolerancia minima aceptada para el vector de soluciones</li>\n",
+    "</p>\n",
+    "    \n",
+    "    \n",
+    "<h4 style=\"padding-left: 30px;\">Pseudoc&oacute;digo:</h4>\n",
+    "<ul>\n",
+    "    <li>Encontrar el jacobiano de $f$ como $Jf$\n",
+    "    <li>Aplicar la fórmula de aproximación de la sección de Formulación matemática para obtener $x_{k}$   \n",
+    "    <li>Definir $x_{0}=x_{k}$\n",
+    "    <li>Definir el error como $error=tol+1$\n",
+    "    <li>Definir la iteracion como $k=k+1$\n",
+    "<ul>\n",
+    "    \n",
+    "\n",
+    "</ul>\n",
+    "</li><li> Mientras el $error>tol $\n",
+    "<ul>\n",
+    "    \n",
+    "\\begin{equation}\n",
+    "    y^{(k)} = x^{(k)} - \\frac{1}{2} [F'(x^{(k)})]^{-1}F(x^{((k))})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    z^{(k)} = \\frac{1}{3}(4y^{(k)} - x^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    u^{(k)} = y^{(k)} + [F'(x^{(k)} - 3F'(z^{(k)})]^{-1}F(x^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    v^{(k)} = u^{(k)} + 2[F'(x^{(k)} - 3F'(z^{(k)})]^{-1}F(u^{(k)})\n",
+    "\\end{equation}\n",
+    "\n",
+    "\\begin{equation}\n",
+    "    x^{k+1)} = v^{(k)} + 2[F'(x^{(k)} - 3F'(z^{(k)})]^{-1}F(v^{(k)})\n",
+    "\\end{equation}  \n",
+    "    \n",
+    "     \n",
+    "<li>k = k+1</li>    \n",
+    "<li>error = $\\begin{Vmatrix}\n",
+    "f(x_{k})\n",
+    "\\end{Vmatrix}$</li>\n",
+    "    \n",
+    "\n",
+    "</ul>\n",
+    "</li>\n",
+    "<li>fin</li>\n",
+    "</ul>\n",
+    "</div>\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><strong>e) Método linsolve</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-block alert-success\">\n",
+    "<h4>En GNU Octave, el metodo linsolve es utilizado para resolver sistemas de ecuaciones</h4>\n",
+    "\n",
+    "<h4>X = linsolve(A,B) resuelve el sistema lineal AX = B usando uno de los siguientes métodos:</h4>\n",
+    " \n",
+    "<p>\n",
+    "        <li>Cuando A es cuadrado, linsolve usa la factorización LU con pivote parcial.</li>\n",
+    "        <li>Para todos los demás casos, linsolve utiliza la factorización QR con pivote de columna.</li>\n",
+    "</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><strong>f) C&oacute;digo en GNU Octave</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "warning('off')\n",
+    "pkg load symbolic\n",
+    "function [x_k, itera] = metodo_2(F, vars, x_0, tol)\n",
+    "  w = [];\n",
+    "  x = [];\n",
+    "  y = [];\n",
+    "  z = [];\n",
+    "  error = [];\n",
+    "  itera = 0;\n",
+    "  iteraciones = [];\n",
+    "  ep = tol + 1;\n",
+    "  \n",
+    "  JF = jacobian(F, vars);\n",
+    "  \n",
+    "  while(ep > tol)\n",
+    "\n",
+    "    mdx = linsolve(double((Fx(JF, vars, x_0))), double(Fx(F, vars, x_0))');\n",
+    "    \n",
+    "    y_k = x_0 - (1/2)*(mdx');\n",
+    "    \n",
+    "    z_k = (1/3)*(4*y_k - x_0);\n",
+    "  \n",
+    "    mxz = double((Fx(JF, vars, x_0)) - 3 * (Fx(JF, vars, z_k)));\n",
+    " \n",
+    "    mxzxSolve = linsolve(mxz, double(Fx(F, vars, x_0))');\n",
+    "    \n",
+    "    u_k = y_k + mxzxSolve';\n",
+    "  \n",
+    "    mxz2 = double((Fx(JF, vars, x_0) - 3 * Fx(JF, vars, z_k)));\n",
+    "    \n",
+    "    \n",
+    "    mxzuSolve = linsolve(2*mxz2, double(Fx(F, vars, x_0))');\n",
+    "    \n",
+    "    v_k = u_k + mxzuSolve';\n",
+    "  \n",
+    "    mxzvSolve = linsolve(2*mxz2, double(Fx(F, vars, v_k))');\n",
+    "    \n",
+    "    x_k = v_k + mxzvSolve';\n",
+    "  \n",
+    "    x_0 = x_k;\n",
+    "  \n",
+    "    itera = itera + 1;\n",
+    "    iteraciones = [iteraciones itera];\n",
+    "    w = [w x_0(1)];\n",
+    "    x = [x x_0(2)];\n",
+    "    y = [y x_0(3)];\n",
+    "    z = [z x_0(4)];\n",
+    "    error = [error ep];\n",
+    "    ep = double(norm(Fx( F, vars, x_0)));\n",
+    "  endwhile\n",
+    "  plot(iteraciones, error, 'b--o');\n",
+    "  title(\"Método de Newton-Raphson\");\n",
+    "  xlabel(\"Iteraciones\");\n",
+    "  ylabel(\"%Error\");\n",
+    "endfunction\n",
+    "\n",
+    "function F = Fx(f, vars, x_0)\n",
+    "  F = subs(f, vars, x_0);\n",
+    "endfunction\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3><strong>g) Problema a Resolver</strong></h3>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pkg load symbolic\n",
+    "syms x y z w\n",
+    "f=[(w**2)+x-(3*y)+(4*z)+(3/4),(3*w**2)+x-(y**2)+(z**2)+(13/4),(5*w)+(3*x**2)+y-(4*z**2)-(99/2),(8*w**2)-(14*x)+(6*y**2)-(7*z**2)+7];\n",
+    "vars=[w,x,y,z];\n",
+    "x0=[2 1 2 1];\n",
+    "tol=0.1;\n",
+    "[x_k,itera]=metodo_2(f,vars,x0,tol)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Octave",
+   "language": "octave",
+   "name": "octave"
+  },
+  "language_info": {
+   "file_extension": ".m",
+   "help_links": [
+    {
+     "text": "GNU Octave",
+     "url": "https://www.gnu.org/software/octave/support.html"
+    },
+    {
+     "text": "Octave Kernel",
+     "url": "https://github.com/Calysto/octave_kernel"
+    },
+    {
+     "text": "MetaKernel Magics",
+     "url": "https://metakernel.readthedocs.io/en/latest/source/README.html"
+    }
+   ],
+   "mimetype": "text/x-octave",
+   "name": "octave",
+   "version": "5.2.0"
+  },
+  "sos": {
+   "kernels": [
+    [
+     "Octave",
+     "octave",
+     "octave",
+     "",
+     ""
+    ],
+    [
+     "Python 3",
+     "python3",
+     "python3",
+     "",
+     {
+      "name": "ipython",
+      "version": 3
+     }
+    ]
+   ],
+   "panel": {
+    "displayed": true,
+    "height": 0
+   },
+   "version": "0.21.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
